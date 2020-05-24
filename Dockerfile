@@ -4,12 +4,12 @@ FROM archlinux/base
 
 RUN pacman -Sy \
       && pacman -S --noconfirm reflector \
-      && reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist \
+      && reflector --verbose --latest 15 --sort rate --save /etc/pacman.d/mirrorlist \
       && pacman -Su --noconfirm
 
 # Install yay
 
-RUN pacman -S --noconfirm sudo git go fakeroot binutils make gcc gawk file \
+RUN pacman -Sy --noconfirm sudo git go fakeroot binutils make gcc gawk file \
       && useradd -m yay \
       && sudo -u yay git clone https://aur.archlinux.org/yay.git /tmp/yay \
       && cd /tmp/yay \
@@ -28,14 +28,14 @@ RUN pacman -Rsc --noconfirm sudo git go fakeroot binutils make gcc gawk file yay
 
 # Configure
 
-RUN mkdir -p /var/lib/mopidy/.config \
-      && chown -R nobody:nobody /var/lib/mopidy
-COPY mopidy.conf /var/lib/mopidy/.config/mopidy/mopidy.conf
+COPY mopidy.conf /etc/mopidy/mopidy.conf
+
+RUN chmod -R o+rwx /var/lib/mopidy
 
 # Run
 
 ENV HOME=/var/lib/mopidy
-USER nobody
+USER mopidy
 
 EXPOSE 6680
 
